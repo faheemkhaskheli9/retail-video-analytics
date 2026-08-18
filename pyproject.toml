@@ -1,0 +1,5 @@
+[project]
+name = "retail-video-analytics"
+version = "0.1.0"
+description = "Retail Video Analytics Platform"
+requires-python = ">=3.10"
