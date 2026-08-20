@@ -1,0 +1,44 @@
+# Config used by `python -m retail_video_analytics.evaluate`.
+# Same shape as default.yaml; separate file so eval runs don't touch the
+# demo run's database.
+video_source: synthetic
+frame_stride: 1
+fps: 15.0
+cashier_absence_seconds: 5.0
+synthetic_num_frames: 90
+
+detector:
+  backend: hog
+  confidence_threshold: 0.4
+
+tracker:
+  max_age: 10
+  iou_threshold: 0.3
+  min_hits: 1
+
+storage:
+  backend: sqlite
+  path: data/eval.db
+
+zones:
+  - name: entrance
+    kind: entrance
+    polygon:
+      - [0, 0]
+      - [160, 0]
+      - [160, 480]
+      - [0, 480]
+  - name: checkout_counter
+    kind: checkout_counter
+    polygon:
+      - [480, 150]
+      - [640, 150]
+      - [640, 330]
+      - [480, 330]
+  - name: sales_floor
+    kind: generic
+    polygon:
+      - [160, 0]
+      - [480, 0]
+      - [480, 480]
+      - [160, 480]

@@ -11,8 +11,8 @@ dist/
 # Data & models
 *.csv
 *.parquet
-data/raw/
-data/processed/
+*.db
+data/
 models/*.pt
 models/*.onnx
 models/*.engine
