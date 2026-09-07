@@ -37,7 +37,7 @@ See `docs/architecture.md` for the full component breakdown.
 - [x] Entry/exit counting (per `entrance`-kind zone)
 - [x] Dwell-time measurement (per track, per zone)
 - [x] Zone definitions (YAML polygons, ray-casting membership test)
-- [ ] Customer heatmaps -- raw centroid samples collected, no rendering/storage yet
+- [x] Customer heatmaps -- centroid samples binned into a density grid, rendered to PNG + JSON per run and re-generatable from a stored run (`retail_video_analytics.heatmap_cli`)
 - [ ] Cashier/staff detection -- no separate staff-vs-customer classifier; see Limitations
 - [x] Counter-presence detection (`checkout_counter`-kind zone occupancy)
 - [x] Cashier-absence time tracking (threshold-based alert, configurable)
@@ -47,7 +47,7 @@ See `docs/architecture.md` for the full component breakdown.
 
 1. **Phase 1 (done):** Detection + tracking pipeline on sample video (synthetic scene + a real-video code path via OpenCV).
 2. **Phase 2 (done):** Zone definition tooling and dwell-time / entry-exit / cashier-absence logic.
-3. **Phase 3 (partial):** Heatmap and historical analytics storage -- SQLite run storage is done; heatmap rendering is not.
+3. **Phase 3 (partial):** Heatmap and historical analytics storage -- SQLite run storage and traffic/dwell heatmap rendering/persistence are done; ByteTrack/DeepSORT swap + re-eval is not.
 4. **Phase 4 (not started):** Dashboard for store operators.
 
 ## 6. Repository Structure
@@ -133,7 +133,7 @@ the current Result Log.
   zone/dwell/entry-exit/cashier-absence logic -> SQLite storage) executes
   end to end, on CPU, with no external services or downloads required, using
   either the built-in `HOGPersonDetector` on real video or the synthetic
-  demo scene. 43 automated tests exercise every module (`pytest tests/`).
+  demo scene. 52 automated tests exercise every module (`pytest tests/`).
 - **What's simplified/mocked:** there is no real labeled retail-camera
   footage in this environment, so the demo/evaluation input is a synthetic
   scene with known ground truth (`synthetic.py`), not real CCTV video. The
@@ -145,8 +145,8 @@ the current Result Log.
   classifier; "cashier presence" is inferred purely from occupancy of a
   `checkout_counter`-kind zone, so any tracked person standing there counts
   as staff present.
-- **What's not built yet:** heatmap rendering/persistence and the operator
-  dashboard (Phases 3-4).
+- **What's not built yet:** the operator dashboard (Phase 4) and the
+  ByteTrack/DeepSORT tracker swap (Phase 3).
 
 ## 12. API
 
@@ -168,7 +168,7 @@ docker run -p 8000:8000 retail-video-analytics
 
 ```bash
 uv pip install -e ".[dev]"
-uv run pytest tests/    # 43 tests, CPU-only, ~15s, no network/GPU required
+uv run pytest tests/    # 52 tests, CPU-only, ~15s, no network/GPU required
 ```
 
 ## 15. Limitations
@@ -194,14 +194,14 @@ uv run pytest tests/    # 43 tests, CPU-only, ~15s, no network/GPU required
   neither of which this environment's test suite depends on.
 - No separate cashier/staff detector -- "cashier presence" is inferred from
   any tracked person occupying a `checkout_counter`-kind zone.
-- Heatmap rendering/persistence and the operator dashboard (README Phases
-  3-4) are not implemented.
+- The operator dashboard (README Phase 4) and the ByteTrack/DeepSORT tracker
+  swap (README Phase 3) are not implemented.
 
 ## 16. Future Work
 
 - Swap the tracker for ByteTrack or DeepSORT and re-run the evaluation to
   quantify the accuracy improvement under the same noise scenarios.
-- Render/persist the heatmap samples `EventEngine` already collects.
+- [x] Render/persist the heatmap samples `EventEngine` already collects (`python -m retail_video_analytics.heatmap_cli --run-id <id>`; also written automatically per persisted pipeline run into `storage.heatmap_dir`).
 - Build the FastAPI + React operator dashboard (Phase 4).
 - Expand evaluation coverage and add CI-based regression checks.
 - Track open items as GitHub Issues.

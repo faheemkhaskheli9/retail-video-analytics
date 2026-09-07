@@ -39,6 +39,7 @@ class ZoneConfig:
 class StorageConfig:
     backend: str = "sqlite"
     path: str = "data/analytics.db"
+    heatmap_dir: str = "data/heatmaps"
 
 
 @dataclass
@@ -46,6 +47,8 @@ class PipelineConfig:
     video_source: str = "synthetic"
     frame_stride: int = 1
     fps: float = 15.0
+    frame_width: int = 640
+    frame_height: int = 480
     cashier_absence_seconds: float = 30.0
     synthetic_num_frames: int = 90
     detector: DetectorConfig = field(default_factory=DetectorConfig)

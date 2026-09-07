@@ -1,0 +1,34 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "RVA: run pipeline (synthetic)",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "retail_video_analytics.main",
+      "args": ["--config", "configs/default.yaml"],
+      "cwd": "${workspaceFolder}",
+      "env": { "PYTHONPATH": "${workspaceFolder}/src" },
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "RVA: generate heatmap (run 1)",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "retail_video_analytics.heatmap_cli",
+      "args": ["--db", "data/analytics.db", "--run-id", "1"],
+      "cwd": "${workspaceFolder}",
+      "env": { "PYTHONPATH": "${workspaceFolder}/src" },
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "RVA: pytest",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": ["tests/", "-v"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal"
+    }
+  ]
+}

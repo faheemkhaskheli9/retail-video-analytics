@@ -16,6 +16,7 @@ from typing import Iterable, Iterator
 
 import numpy as np
 
+from .analytics.heatmap import render_heatmap, save_heatmap
 from .config import PipelineConfig
 from .detection.base import Detection, Detector
 from .detection import build_detector
@@ -35,6 +36,8 @@ class RunSummary:
     dwell_records: list[DwellRecord]
     cashier_alerts: list[CashierAbsenceAlert]
     run_id: int | None = None
+    heatmap_png: str | None = None
+    heatmap_data: str | None = None
 
     def as_dict(self) -> dict:
         return {
@@ -63,6 +66,8 @@ class RunSummary:
                 for a in self.cashier_alerts
             ],
             "run_id": self.run_id,
+            "heatmap_png": self.heatmap_png,
+            "heatmap_data": self.heatmap_data,
         }
 
 
@@ -154,7 +159,19 @@ class VideoAnalyticsPipeline:
                     zone_counts=summary.zone_counts,
                     dwell_records=summary.dwell_records,
                     cashier_alerts=summary.cashier_alerts,
+                    position_samples=self.event_engine.heatmap_samples,
+                    frame_width=self.config.frame_width,
+                    frame_height=self.config.frame_height,
                 )
                 summary.run_id = run_id
+
+            grid = render_heatmap(
+                self.event_engine.heatmap_samples,
+                self.config.frame_width,
+                self.config.frame_height,
+            )
+            artifacts = save_heatmap(grid, self.config.storage.heatmap_dir, run_id)
+            summary.heatmap_png = str(artifacts.png_path)
+            summary.heatmap_data = str(artifacts.data_path)
 
         return summary

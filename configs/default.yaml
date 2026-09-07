@@ -5,6 +5,8 @@
 video_source: synthetic
 frame_stride: 1
 fps: 15.0
+frame_width: 640
+frame_height: 480
 cashier_absence_seconds: 5.0   # short for the demo; a real deployment would use 60-120s
 
 detector:
@@ -21,6 +23,7 @@ tracker:
 storage:
   backend: sqlite
   path: data/analytics.db
+  heatmap_dir: data/heatmaps
 
 # Zones are polygons in frame pixel coordinates (assumes a 640x480 frame,
 # matching the synthetic demo resolution -- adjust to your camera's
